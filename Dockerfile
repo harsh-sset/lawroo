@@ -29,6 +29,13 @@ ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 
 RUN npm run build
 
+# Install production dependencies for the final image
+FROM base AS deps-prod
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production
+
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
@@ -40,6 +47,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+COPY --from=deps-prod /app/node_modules ./node_modules
 COPY --from=builder /app/public ./public
 
 # Set the correct permission for prerender cache
