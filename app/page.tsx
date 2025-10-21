@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useUser, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
 
 export default function Home() {
+  const { isSignedIn, user, isLoaded } = useUser()
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -80,10 +82,63 @@ export default function Home() {
     }
   }
 
+  // Show loading state while Clerk is initializing
+  if (!isLoaded) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </main>
+    )
+  }
+
+  // Show only authentication UI when not signed in
+  if (!isSignedIn) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md mx-auto text-center">
+          <div className="bg-white shadow-xl rounded-lg p-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Legal Document Analyzer
+            </h1>
+            <p className="text-lg text-gray-600 mb-8">
+              Sign in to analyze legal documents with AI-powered suggestions
+            </p>
+            
+            <div className="space-y-4">
+              <SignInButton mode="modal">
+                <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-md text-sm font-medium transition-colors">
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="w-full bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-600 px-6 py-3 rounded-md text-sm font-medium transition-colors">
+                  Sign Up
+                </button>
+              </SignUpButton>
+            </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // Show full app when signed in
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
+        {/* Header with User Info */}
         <div className="text-center mb-8">
+          <div className="flex justify-end items-center mb-4">
+            <div className="flex items-center space-x-3">
+              <span className="text-sm text-gray-600">
+                Welcome, {user?.firstName || user?.emailAddresses[0]?.emailAddress}!
+              </span>
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Legal Document Analyzer
           </h1>

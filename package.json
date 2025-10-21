@@ -15,6 +15,7 @@
   "type": "commonjs",
   "dependencies": {
     "@ai-sdk/google": "^2.0.23",
+    "@clerk/nextjs": "^6.33.7",
     "@tailwindcss/postcss": "^4.1.14",
     "@xmldom/xmldom": "^0.8.11",
     "ai": "^5.0.76",
