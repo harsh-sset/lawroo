@@ -250,7 +250,7 @@ async function extractTextFromXml(buffer: Buffer): Promise<string> {
 }
 
 async function analyzeLegalDocument(text: string): Promise<Suggestion[]> {
-  const model = google('gemini-2.0-flash-exp')
+  const model = google('gemini-2.5-pro')
 
   const { object } = await generateObject({
     model,
